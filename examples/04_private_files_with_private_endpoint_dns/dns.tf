@@ -1,5 +1,5 @@
 module "private_dns" {
-  source = "../../"
+  source = "github.com/mlinxfeld/terraform-az-fk-private-dns"
 
   resource_group_name    = azurerm_resource_group.foggykitchen_rg.name
   private_dns_zone_names = [local.dns_zone_name]
