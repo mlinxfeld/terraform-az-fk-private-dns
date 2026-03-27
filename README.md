@@ -2,7 +2,7 @@
 
 This repository contains a reusable **Terraform / OpenTofu module** and progressive examples for creating **Azure Private DNS Zones** and linking them to **Virtual Networks**.
 
-It is part of the **[FoggyKitchen.com training ecosystem](https://foggykitchen.com/courses-2/)** and is designed as a dedicated **private DNS layer** for Azure workloads and private endpoints.
+It is part of the **[FoggyKitchen.com training ecosystem](https://foggykitchen.com/courses/azure-fundamentals-terraform-course/)** and is designed as a dedicated **private DNS layer** for Azure workloads and private endpoints.
 
 ---
 
