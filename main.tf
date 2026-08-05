@@ -30,8 +30,20 @@ resource "azurerm_private_dns_zone_virtual_network_link" "this" {
   resource_group_name   = var.resource_group_name
   private_dns_zone_name = azurerm_private_dns_zone.this[each.value.zone_name].name
 
-  virtual_network_id    = each.value.vnet_id
-  registration_enabled  = each.value.registration_enabled
+  virtual_network_id   = each.value.vnet_id
+  registration_enabled = each.value.registration_enabled
 
   tags = var.tags
+}
+
+resource "azurerm_private_dns_a_record" "this" {
+  for_each = var.private_dns_a_records
+
+  name                = each.value.name
+  zone_name           = azurerm_private_dns_zone.this[each.value.zone_name].name
+  resource_group_name = var.resource_group_name
+  ttl                 = each.value.ttl
+  records             = each.value.records
+
+  depends_on = [azurerm_private_dns_zone_virtual_network_link.this]
 }

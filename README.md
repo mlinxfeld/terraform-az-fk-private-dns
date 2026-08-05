@@ -37,6 +37,7 @@ Depending on configuration and example used, the module can:
 
 - Create one or more **Private DNS Zones**
 - Create **VNet links** for each zone
+- Create optional **Private DNS A records**
 - Support multiple VNets per zone (via `vnet_links`)
 - Provide a clean mapping of **zone IDs** for Private Endpoint DNS integration
 
@@ -89,6 +90,14 @@ module "private_dns" {
     }
   }
 
+  private_dns_a_records = {
+    blob = {
+      zone_name = "privatelink.blob.core.windows.net"
+      name      = "mystorageaccount"
+      records   = ["10.0.1.4"]
+    }
+  }
+
   tags = {
     project = "foggykitchen"
     env     = "dev"
@@ -105,6 +114,8 @@ module "private_dns" {
 | `private_dns_zone_ids` | Map of Private DNS Zone IDs keyed by zone name |
 | `private_dns_zone_names` | List of created Private DNS Zone names |
 | `vnet_link_ids` | Map of VNet link IDs keyed by `<zone>::<link_name>` |
+| `private_dns_a_record_ids` | Map of Private DNS A record IDs keyed by record key |
+| `private_dns_a_record_names` | Map of Private DNS A record names keyed by record key |
 
 ---
 

@@ -11,7 +11,7 @@ Examples:
 - privatelink.file.core.windows.net
 - privatelink.vaultcore.azure.net
 EOT
-  type = set(string)
+  type        = set(string)
 
   validation {
     condition     = length(var.private_dns_zone_names) > 0
@@ -46,6 +46,33 @@ EOT
   validation {
     condition     = alltrue([for k, v in var.vnet_links : length(trimspace(v.vnet_id)) > 0])
     error_message = "Each vnet_links entry must include a non-empty vnet_id."
+  }
+}
+
+variable "private_dns_a_records" {
+  description = "Map of Private DNS A records to create."
+  type = map(object({
+    zone_name = string
+    name      = string
+    ttl       = optional(number, 300)
+    records   = list(string)
+  }))
+  default = {}
+
+  validation {
+    condition = alltrue([
+      for record in var.private_dns_a_records :
+      contains(var.private_dns_zone_names, record.zone_name)
+    ])
+    error_message = "Each private_dns_a_records entry must reference a zone from private_dns_zone_names."
+  }
+
+  validation {
+    condition = alltrue([
+      for record in var.private_dns_a_records :
+      length(record.records) > 0
+    ])
+    error_message = "Each private_dns_a_records entry must include at least one IP address."
   }
 }
 
