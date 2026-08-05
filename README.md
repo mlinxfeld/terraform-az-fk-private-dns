@@ -105,6 +105,38 @@ module "private_dns" {
 }
 ```
 
+When the zone name is known only after apply, use `private_dns_zones` with a
+stable logical key and reference that key from records:
+
+```hcl
+module "private_dns" {
+  source = "git::https://github.com/foggykitchen/terraform-az-fk-private-dns.git?ref=v1.0.0"
+
+  resource_group_name = "fk-rg"
+
+  private_dns_zones = {
+    container_apps = {
+      name = module.container_app.environment_default_domain
+    }
+  }
+
+  vnet_links = {
+    container_apps = {
+      vnet_id              = module.vnet.vnet_id
+      registration_enabled = false
+    }
+  }
+
+  private_dns_a_records = {
+    wildcard = {
+      zone_key = "container_apps"
+      name     = "*"
+      records  = [module.container_app.environment_static_ip_address]
+    }
+  }
+}
+```
+
 ---
 
 ## 📤 Outputs

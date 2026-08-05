@@ -1,5 +1,5 @@
 output "private_dns_zone_ids" {
-  description = "Map of Private DNS Zone IDs keyed by zone name. Useful for Private Endpoint DNS zone groups."
+  description = "Map of Private DNS Zone IDs keyed by zone key."
   value       = { for zone_name, z in azurerm_private_dns_zone.this : zone_name => z.id }
 }
 

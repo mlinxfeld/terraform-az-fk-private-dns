@@ -12,11 +12,20 @@ Examples:
 - privatelink.vaultcore.azure.net
 EOT
   type        = set(string)
+  default     = []
 
   validation {
-    condition     = length(var.private_dns_zone_names) > 0
-    error_message = "private_dns_zone_names must contain at least one DNS zone name."
+    condition     = length(var.private_dns_zone_names) > 0 || length(var.private_dns_zones) > 0
+    error_message = "At least one Private DNS Zone must be provided through private_dns_zone_names or private_dns_zones."
   }
+}
+
+variable "private_dns_zones" {
+  description = "Map of Private DNS Zones to create, keyed by a stable logical name."
+  type = map(object({
+    name = string
+  }))
+  default = {}
 }
 
 variable "vnet_links" {
@@ -52,7 +61,8 @@ EOT
 variable "private_dns_a_records" {
   description = "Map of Private DNS A records to create."
   type = map(object({
-    zone_name = string
+    zone_key  = optional(string)
+    zone_name = optional(string)
     name      = string
     ttl       = optional(number, 300)
     records   = list(string)
@@ -62,9 +72,24 @@ variable "private_dns_a_records" {
   validation {
     condition = alltrue([
       for record in var.private_dns_a_records :
-      contains(var.private_dns_zone_names, record.zone_name)
+      try(record.zone_key, null) != null || try(record.zone_name, null) != null
     ])
-    error_message = "Each private_dns_a_records entry must reference a zone from private_dns_zone_names."
+    error_message = "Each private_dns_a_records entry must include zone_key or zone_name."
+  }
+
+  validation {
+    condition = alltrue([
+      for record in var.private_dns_a_records :
+      (
+        try(record.zone_key, null) != null &&
+        contains(keys(var.private_dns_zones), record.zone_key)
+      ) ||
+      (
+        try(record.zone_name, null) != null &&
+        contains(var.private_dns_zone_names, record.zone_name)
+      )
+    ])
+    error_message = "Each private_dns_a_records entry must reference a zone from private_dns_zones or private_dns_zone_names."
   }
 
   validation {
